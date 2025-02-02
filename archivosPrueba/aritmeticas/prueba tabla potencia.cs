@@ -1,0 +1,13 @@
+console.log("-----------------Enteros-----------------");
+console.log(2^3);
+console.log(2^4.3);
+console.log("-----------------Decimal-----------------");
+console.log(2.4^5);
+console.log(3.2^2.3);
+console.log("-----------------Errores-----------------");
+console.log(2^'a');
+console.log(5.3^'a');
+console.log("a"^'a');
+console.log(2^"hola");
+console.log('a'^2);
+console.log("-----------------------------------------");

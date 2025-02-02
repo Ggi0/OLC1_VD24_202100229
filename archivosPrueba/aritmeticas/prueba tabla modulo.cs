@@ -1,0 +1,12 @@
+console.log("---------- entero----------------");
+console.log(3%5);
+console.log(3%2.3);
+console.log("---------- decimal ----------------");
+console.log(5.2%2);
+console.log(4.3%5.2);
+console.log("---------- Errores----------------");
+console.log(true%'a');
+console.log("hola"%5.2);
+console.log(4.2%0);
+console.log(4%0);
+console.log(0%0.1);

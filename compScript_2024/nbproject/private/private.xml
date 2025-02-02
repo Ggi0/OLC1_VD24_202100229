@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/Users/gio/Desktop/compi1_V2S24/LAB_compi1_2S24V/proyecto/olc1_vd24_202100229/compScript_2024/src/patronInterprete/instrucciones/vectores/DeclaracionV2.java</file>
+            <file>file:/Users/gio/Desktop/compi1_V2S24/LAB_compi1_2S24V/proyecto/olc1_vd24_202100229/compScript_2024/src/analizadores/lexico.jflex</file>
+            <file>file:/Users/gio/Desktop/compi1_V2S24/LAB_compi1_2S24V/proyecto/olc1_vd24_202100229/compScript_2024/src/patronInterprete/instrucciones/Llamada.java</file>
+            <file>file:/Users/gio/Desktop/compi1_V2S24/LAB_compi1_2S24V/proyecto/olc1_vd24_202100229/compScript_2024/src/patronInterprete/instrucciones/Return_stc.java</file>
+            <file>file:/Users/gio/Desktop/compi1_V2S24/LAB_compi1_2S24V/proyecto/olc1_vd24_202100229/compScript_2024/src/patronInterprete/instrucciones/AccesoVar.java</file>
+            <file>file:/Users/gio/Desktop/compi1_V2S24/LAB_compi1_2S24V/proyecto/olc1_vd24_202100229/compScript_2024/src/patronInterprete/expresiones/Suma.java</file>
+            <file>file:/Users/gio/Desktop/compi1_V2S24/LAB_compi1_2S24V/proyecto/olc1_vd24_202100229/compScript_2024/src/patronInterprete/simbolo/Arbol.java</file>
+            <file>file:/Users/gio/Desktop/compi1_V2S24/LAB_compi1_2S24V/proyecto/olc1_vd24_202100229/compScript_2024/src/patronInterprete/instrucciones/Metodo.java</file>
+            <file>file:/Users/gio/Desktop/compi1_V2S24/LAB_compi1_2S24V/proyecto/olc1_vd24_202100229/compScript_2024/src/analizadores/Sintactico.java</file>
+            <file>file:/Users/gio/Desktop/compi1_V2S24/LAB_compi1_2S24V/proyecto/olc1_vd24_202100229/compScript_2024/src/analizadores/sintactico.cup</file>
+            <file>file:/Users/gio/Desktop/compi1_V2S24/LAB_compi1_2S24V/proyecto/olc1_vd24_202100229/compScript_2024/src/patronInterprete/instrucciones/Declaracion.java</file>
+            <file>file:/Users/gio/Desktop/compi1_V2S24/LAB_compi1_2S24V/proyecto/olc1_vd24_202100229/compScript_2024/src/patronInterprete/instrucciones/Structs_func/InstanciaSTRUCT.java</file>
+            <file>file:/Users/gio/Desktop/compi1_V2S24/LAB_compi1_2S24V/proyecto/olc1_vd24_202100229/compScript_2024/src/interfaz/Ventana_principal.java</file>
+            <file>file:/Users/gio/Desktop/compi1_V2S24/LAB_compi1_2S24V/proyecto/olc1_vd24_202100229/compScript_2024/src/patronInterprete/instrucciones/While_ciclos.java</file>
+            <file>file:/Users/gio/Desktop/compi1_V2S24/LAB_compi1_2S24V/proyecto/olc1_vd24_202100229/compScript_2024/src/patronInterprete/simbolo/Simbolo.java</file>
+            <file>file:/Users/gio/Desktop/compi1_V2S24/LAB_compi1_2S24V/proyecto/olc1_vd24_202100229/compScript_2024/src/patronInterprete/instrucciones/Structs_func/DeclaracionStructs.java</file>
+            <file>file:/Users/gio/Desktop/compi1_V2S24/LAB_compi1_2S24V/proyecto/olc1_vd24_202100229/compScript_2024/src/patronInterprete/instrucciones/vectores/DeclaracionV1.java</file>
+            <file>file:/Users/gio/Desktop/compi1_V2S24/LAB_compi1_2S24V/proyecto/olc1_vd24_202100229/compScript_2024/src/patronInterprete/simbolo/tablaSimbolos.java</file>
+        </group>
+    </open-files>
+</project-private>

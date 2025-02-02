@@ -1,0 +1,202 @@
+<inicio> ::= <declaracionesGlobales>
+
+<declaracionesGlobales> ::= <declaracionesGlobales> <declaracionG>
+                          | <declaracionG>
+
+<declaracionG> ::= <run> ";"
+                 | <metodo>
+                 | <declaracion> ";"
+                 | <declaracionV1> ";"
+                 | <declaracionV2> ";"
+                 | <asignacionV2> ";"
+                 | <struct> ";"
+                 | <declaracionLista> ";"
+
+<instrucciones> ::= <instrucciones> <instruccion>
+                  | <instruccion>
+
+<instruccion> ::= <impresion> ";"
+                | <declaracion> ";"
+                | <asignacion> ";"
+                | <stcIf>
+                | <stcMatch>
+                | <cFor>
+                | <cWhile>
+                | <cDoWhile> ";"
+                | <break> ";"
+                | <continuar> ";"
+                | <declaracionV1> ";"
+                | <asignacionV1> ";"
+                | <declaracionV2> ";"
+                | <asignacionV2> ";"
+                | <declaracionLista> ";"
+                | <appendLista> ";"
+                | <asignacionLista> ";"
+                | <removeLista> ";"
+                | <popLista> ";"
+                | <reverseLista> ";"
+                | <struct> ";"
+                | <llamada> ";"
+                | <return> ";"
+                | error ";"
+
+<impresion> ::= "IMPRIMIR" "(" <expresion> ")"
+
+<declaracion> ::= "MUTB" <ID> ":" <tipos>
+                | "MUTB" <ID> ":" <tipos> "=" <expresion>
+
+<asignacion> ::= <ID> "=" <expresion>
+               | <ID> "INCREMENTO"
+               | <ID> "DECREMENTO"
+
+<castear> ::= "CAST" "(" <expresion> "AS" <tipos> ")"
+
+<round> ::= "ROUND" "(" <expresion> ")"
+
+<length> ::= "LENGTH" "(" <expresion> ")"
+           | "LENGTH" "(" <ID> "{" <expresion> "}" ")"
+
+<toString> ::= "toSTRING" "(" <expresion> ")"
+
+<stcIf> ::= "IF" "(" <expresion> ")" "{" <instrucciones> "}"
+          | "IF" "(" <expresion> ")" "{" <instrucciones> "}" "ELSE" "{" <instrucciones> "}"
+          | "IF" "(" <expresion> ")" "{" <instrucciones> "}" "ELSE" <stcIf>
+
+<cFor> ::= "FOR" "(" <asignacion> ";" <expresion> ";" <asignacion> ")" "{" <instrucciones> "}"
+
+<cWhile> ::= "WHILE" "(" <expresion> ")" "{" <instrucciones> "}"
+
+<cDoWhile> ::= "DO" "{" <instrucciones> "}" "WHILE" "(" <expresion> ")"
+
+<stcMatch> ::= "MATCH" "(" <expresion> ")" "{" <casos> "}"
+             | "MATCH" "(" <expresion> ")" "{}"
+
+<casos> ::= <listCasos>
+          | <listCasos> <casoDefecto>
+          | <casoDefecto>
+
+<listCasos> ::= <listCasos> <casoIndv>
+              | <casoIndv>
+
+<casoIndv> ::= <expresion> "ARROW" "{" <instrucciones> "}"
+
+<casoDefecto> ::= "DEFAULT" "ARROW" "{" <instrucciones> "}"
+
+<declaracionV1> ::= "MUTB" <ID> ":" <tipos> "[" "]"
+                  | "MUTB" <ID> ":" <tipos> "[" "]" "=" "[" <valoresVector1> "]"
+
+<declaracionV2> ::= "MUTB" <ID> ":" <tipos> "[" "]" "[" "]"
+                  | "MUTB" <ID> ":" <tipos> "[" "]" "[" "]" "=" "[" <listListasV> "]"
+
+<listListasV> ::= <listListasV> "," "[" <valoresVector1> "]"
+                | "[" <valoresVector1> "]"
+
+<valoresVector1> ::= <valoresVector1> "," <expresion>
+                   | <expresion>
+
+<accesoV> ::= <ID> "[" <expresion> "]"
+
+<asignacionV1> ::= <ID> "[" <expresion> "]" "=" <expresion>
+
+<accesoV2> ::= <ID> "[" <expresion> "]" "[" <expresion> "]"
+
+<asignacionV2> ::= <ID> "[" <expresion> "]" "[" <expresion> "]" "=" <expresion>
+
+<declaracionLista> ::= "MUTB" <ID> ":" "LISTA" "<" <tipos> ">"
+
+<appendLista> ::= <ID> "." "APPEND" "(" <expresion> ")"
+
+<accesoLista> ::= <ID> "." "GETLIST" "(" <expresion> ")"
+
+<asignacionLista> ::= <ID> "." "SETLIST" "(" <expresion> "," <expresion> ")"
+
+<removeLista> ::= <ID> "." "REMVLIST" "(" <expresion> ")"
+
+<popLista> ::= <ID> "." "POPLIST" "(" ")"
+
+<reverseLista> ::= <ID> "." "REVERSELIST" "(" ")"
+
+<struct> ::= "STRUCT" <ID> "{" <listAtributos> "}"
+
+<listAtributos> ::= <listAtributos> <atributoSTR>
+                  | <atributoSTR>
+
+<atributoSTR> ::= <ID> ":" <tipos> ";"
+                | <ID> ":" <ID> ";"
+
+<instaStruct> ::= "MUTB" <ID> ":" <ID> "=" "{" <listaValorSTR> "}"
+                | "{" <listaValorSTR> "}"
+
+<listaValorSTR> ::= <listaValorSTR> "," <valorSTR>
+                  | <valorSTR>
+
+<valorSTR> ::= <ID> ":" <expresion>
+             | <ID> ":" <instaStruct>
+
+<break> ::= "BREAKK"
+
+<continuar> ::= "CONTINUAR"
+
+<return> ::= "RETURNSTC" <expresion>
+           | "RETURNSTC"
+
+<metodo> ::= <tipos> <ID> "(" <parametros> ")" "{" <instrucciones> "}"
+           | <tipos> <ID> "(" ")" "{" <instrucciones> "}"
+
+<parametros> ::= <parametros> "," <parametro>
+               | <parametro>
+
+<parametro> ::= <ID> ":" <tipos> "=" <expresion>
+              | <ID> ":" <tipos>
+
+<run> ::= "MMMAIN" <ID> "(" <parametrosLlamada> ")"
+        | "MMMAIN" <ID> "(" ")"
+
+<parametrosLlamada> ::= <parametrosLlamada> "," <ID> "=" <expresion>
+                      | <ID> "=" <expresion>
+
+<llamada> ::= <ID> "(" <parametrosLlamada> ")"
+            | <ID> "(" ")"
+
+<expresion> ::= "-" <expresion>
+              | <expresion> "POTENCIA" <expresion>
+              | <expresion> "RAIZ" <expresion>
+              | <expresion> "MULTI" <expresion>
+              | <expresion> "DIV" <expresion>
+              | <expresion> "MODULO" <expresion>
+              | <expresion> "MAS" <expresion>
+              | <expresion> "MENOS" <expresion>
+              | <expresion> "EQUALS" <expresion>
+              | <expresion> "DIFERN" <expresion>
+              | <expresion> "MENOR" <expresion>
+              | <expresion> "MAYOR" <expresion>
+              | <expresion> "MENIGUAL" <expresion>
+              | <expresion> "MAYIGUAL" <expresion>
+              | "NOT" <expresion>
+              | <expresion> "AND" <expresion>
+              | <expresion> "OR" <expresion>
+              | "ENTERO"
+              | "CADENA"
+              | "CARACTER"
+              | "DECIMAL"
+              | "TRUE"
+              | "FALSE"
+              | <ID>
+              | <accesoV>
+              | <accesoV2>
+              | <accesoLista>
+              | <removeLista>
+              | <popLista>
+              | <llamada>
+              | <castear>
+              | <round>
+              | <length>
+              | <toString>
+              | "(" <expresion> ")"
+
+<tipos> ::= "INT"
+          | "DOUBLE"
+          | "BOOL"
+          | "CHARV"
+          | "STRING"
+          | "METODO"

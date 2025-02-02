@@ -1,0 +1,522 @@
+
+// ---------------------------- PAQUETES E IMPORTACIONES ----------------------------
+package analizadores;
+
+import java_cup.runtime.*;
+import java.util.LinkedList;
+import java.util.HashMap;
+
+import patronInterprete.abstracto.Instruccion;
+import patronInterprete.simbolo.*;
+
+import patronInterprete.expresiones.Nativo;
+
+import patronInterprete.instrucciones.Imprimir;
+import patronInterprete.instrucciones.Declaracion;
+import patronInterprete.instrucciones.AccesoVar;
+import patronInterprete.instrucciones.AsignacionVar;
+import patronInterprete.instrucciones.Casteo;
+
+import patronInterprete.instrucciones.If_stcControl;
+import patronInterprete.instrucciones.IfElse_stcControl;
+import patronInterprete.instrucciones.ElseIf_stcControl;
+import patronInterprete.instrucciones.Match_stc;
+import patronInterprete.instrucciones.Caso;
+
+import patronInterprete.instrucciones.For_ciclos;
+import patronInterprete.instrucciones.While_ciclos;
+import patronInterprete.instrucciones.DoWhile_ciclos;
+
+import patronInterprete.instrucciones.Break_stc;
+import patronInterprete.instrucciones.Continuar;
+
+import patronInterprete.instrucciones.Incremento;
+import patronInterprete.instrucciones.Decremento;
+
+import patronInterprete.expresiones.Suma;
+import patronInterprete.expresiones.Resta;
+import patronInterprete.expresiones.NegacionUnaria;
+import patronInterprete.expresiones.Multiplicacion;
+import patronInterprete.expresiones.Division;
+import patronInterprete.expresiones.Potencia;
+import patronInterprete.expresiones.Raiz;
+import patronInterprete.expresiones.Modulo;
+
+import patronInterprete.expresiones.Equals;
+import patronInterprete.expresiones.Diferencia;
+import patronInterprete.expresiones.Menor;
+import patronInterprete.expresiones.Mayor;
+import patronInterprete.expresiones.MenorIgual;
+import patronInterprete.expresiones.MayorIgual;
+
+import patronInterprete.expresiones.OR_logico;
+import patronInterprete.expresiones.AND_logico;
+import patronInterprete.expresiones.NOT_logico;
+
+import patronInterprete.excepciones.Errores;
+
+import patronInterprete.instrucciones.vectores.DeclaracionV1;
+import patronInterprete.instrucciones.vectores.AccesoV1;
+import patronInterprete.instrucciones.vectores.AsignacionV1;
+
+import patronInterprete.instrucciones.vectores.DeclaracionV2;
+import patronInterprete.instrucciones.vectores.AccesoV2;
+import patronInterprete.instrucciones.vectores.AsignacionV2;
+
+import patronInterprete.instrucciones.Listas.DeclaracionLista;
+import patronInterprete.instrucciones.Listas.AppendList;
+import patronInterprete.instrucciones.Listas.AccesoLista;
+import patronInterprete.instrucciones.Listas.AsignacionLista;
+import patronInterprete.instrucciones.Listas.RemoveLista;
+import patronInterprete.instrucciones.Listas.PopListas;
+import patronInterprete.instrucciones.Listas.ReverseLista;
+
+import patronInterprete.instrucciones.Metodo;
+import patronInterprete.instrucciones.Run_Main;
+import patronInterprete.instrucciones.Llamada;
+import patronInterprete.instrucciones.Llamada;
+import patronInterprete.instrucciones.LlamadaFuncion;
+import patronInterprete.instrucciones.Return_stc;
+
+import patronInterprete.instrucciones.Built_in_methodos.Round;
+import patronInterprete.instrucciones.Built_in_methodos.Length_func;
+import patronInterprete.instrucciones.Built_in_methodos.ToString_func;
+
+import patronInterprete.instrucciones.Structs_func.DeclaracionStructs;
+
+
+
+
+
+// ------------> codigo para el sintactico (dentro del analizador)
+// ------------> declaraciones de variables, funciones y funciones de error
+
+parser code
+{:
+    public static String resultado = ""; //comentario para ver
+
+    Lexico s;
+    Sintactico(Lexico s){this.s = s;}
+
+    public LinkedList<Errores> erroresSintacticos = new LinkedList<>();
+    
+    // Manejo de errores sintácticos recuperables.
+    public void syntax_error(Symbol s){
+        System.err.println("Error sintactico RECUPERABLE: " + s.value + " - Fila: " + s.right + " - Columna: " + s.left);
+    
+        erroresSintacticos.add(new Errores("sintactico RECUPERABLE",
+                "No se esperaba el componente "+s.value,
+                s.left,
+                s.right));
+
+    }
+
+    // Manejo de errores sintácticos no recuperables.
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
+        System.err.println("Error sintactico NO RECUPERABLE: " + s.value + " - Fila: " + s.right + " - Columna: " + s.left);
+
+        erroresSintacticos.add(new Errores("Sintactico NO RECUPERABLE",
+            "No se esperaba el componente "+s.value,
+            s.left,
+            s.right));
+
+    }
+:}
+
+
+// ---------------------------- CODIGO PARA LAS ACCIONES GRAMATICALES ----------------------------
+action code
+{: :}
+
+
+
+
+
+// ------------> TERMINALES <------------
+    terminal String CADENA, ENTERO, DECIMAL, CARACTER, ID, MUTB;
+    terminal COLON, SEMICOLON, LPAREN, RPAREN, DOT, LBRACE, RBRACE;
+    terminal LCORCH, RCORCH, COMMA;
+    terminal LISTA, APPEND, GETLIST, SETLIST, REMVLIST, POPLIST, REVERSELIST;
+    
+    terminal IMPRIMIR, TRUE, FALSE, INT, DOUBLE, BOOL, CHARV, STRING; 
+    terminal IF, ELSE, FOR, WHILE, DO, MATCH, ARROW, DEFAULT, BREAKK, CONTINUAR;
+    terminal CAST, AS, ROUND, LENGTH, toSTRING, STRUCT;
+    terminal INCREMENTO, DECREMENTO;
+
+    terminal MAS, MENOS, UMENOS, MULTI, DIV, POTENCIA, RAIZ, MODULO;
+    terminal IGUAL, EQUALS, DIFERN, MENOR, MENIGUAL, MAYOR, MAYIGUAL;
+    terminal OR, AND, NOT;
+
+    terminal METODO, MMMAIN, RETURNSTC;
+
+
+// ------------> NO TERMINALES <------------
+    nonterminal LinkedList<Instruccion> _declaracionesGlobales;
+    nonterminal Instruccion _declaracionG;
+
+    nonterminal LinkedList<Instruccion> _inicio, _instrucciones;
+
+    nonterminal Instruccion _instruccion, _impresion, _declaracion, _asignacion; 
+    nonterminal Instruccion _castear, _round, _length, _toString;
+    nonterminal Instruccion _stcIf, _cFor, _cWhile, _cDoWhile;
+    nonterminal Instruccion _expresion, _break, _continuar;
+    nonterminal Instruccion _stcMatch, _casoIndv, _casoDefecto;
+    nonterminal LinkedList<Caso> _casos, _listCasos;
+    nonterminal Tipo _tipos;
+
+    nonterminal Instruccion _declaracionV1, _accesoV, _asignacionV1;
+    nonterminal LinkedList<Instruccion> _valoresVector1;
+
+    nonterminal Instruccion _declaracionV2, _accesoV2, _asignacionV2;
+    nonterminal LinkedList<LinkedList<Instruccion>> _listListasV;
+
+    nonterminal Instruccion _declaracionLista, _appendLista, _accesoLista;
+    nonterminal Instruccion _asignacionLista, _removeLista, _popLista, _reverseLista;
+
+    nonterminal Instruccion _metodo;
+
+    nonterminal LinkedList<HashMap> _parametros, _parametrosLlamada;
+    nonterminal HashMap<String, Object> _parametro;
+    nonterminal Instruccion _run, _llamada, _llamadaFuncion;
+    nonterminal Instruccion _return;
+
+    nonterminal LinkedList<HashMap> _listAtributos;
+    nonterminal HashMap<String,Object> _atributoSTR;
+    nonterminal Instruccion _struct, _instaStruct;
+    nonterminal HashMap<String,Instruccion> _listaValorSTR, _valorSTR;
+
+
+// ------------> PRECEDENCIA <------------
+    precedence left  OR;
+    precedence left  AND;
+    precedence right NOT;
+    precedence left  EQUALS, DIFERN, MENOR, MENIGUAL, MAYOR, MAYIGUAL;
+    precedence left  MAS, MENOS;
+    precedence left  MULTI, DIV, MODULO;
+    precedence nonassoc POTENCIA, RAIZ;
+    precedence right UMENOS;
+
+
+// ------------> Definir simbolo Inicial
+start with _inicio
+;
+
+
+
+// ---------------------------- PRODUCCIONES ----------------------------
+_inicio ::= _declaracionesGlobales:global    {: RESULT = global; :}
+;
+
+_declaracionesGlobales ::= _declaracionesGlobales:global _declaracionG:dg  {: RESULT = global; RESULT.add(dg); :}
+                         | _declaracionG:dg                                {: RESULT = new LinkedList<Instruccion>(); RESULT.add(dg); :}
+;
+
+// main, metodos, funciones, structs, listas, vectores y variables
+_declaracionG ::= _run:expr              SEMICOLON    {: RESULT = expr; :}
+                | _metodo:expr                        {: RESULT = expr; :}
+                | _declaracion:expr      SEMICOLON    {: RESULT = expr; :}
+                | _declaracionV1:expr    SEMICOLON    {: RESULT = expr; :}
+                | _declaracionV2:expr    SEMICOLON    {: RESULT = expr; :}
+                | _asignacionV2:expr     SEMICOLON    {: RESULT = expr; :}
+                | _struct:expr           SEMICOLON    {: RESULT = expr; :}
+                | _declaracionLista:expr SEMICOLON    {: RESULT = expr; :}
+
+;
+
+// ------------------- Instrucciones -----------------------------
+_instrucciones ::= _instrucciones:listInstr _instruccion:nuevaInstr     {: RESULT = listInstr; RESULT.add(nuevaInstr); :}
+                 | _instruccion:instr                                   {: RESULT = new LinkedList<Instruccion>(); RESULT.add(instr); :}
+;
+
+_instruccion ::= _impresion:expr        SEMICOLON    {: RESULT = expr; :}
+               | _declaracion:expr      SEMICOLON    {: RESULT = expr; :}
+               | _asignacion:expr       SEMICOLON    {: RESULT = expr; :}
+               | _stcIf:expr                         {: RESULT = expr; :}
+               | _stcMatch:expr                      {: RESULT = expr; :} 
+               | _cFor:expr                          {: RESULT = expr; :}
+               | _cWhile:expr                        {: RESULT = expr; :}
+               | _cDoWhile:expr         SEMICOLON    {: RESULT = expr; :}
+               | _break:expr            SEMICOLON    {: RESULT = expr; :}
+               | _continuar:expr        SEMICOLON    {: RESULT = expr; :}
+               | _declaracionV1:expr    SEMICOLON    {: RESULT = expr; :}
+               | _asignacionV1:expr     SEMICOLON    {: RESULT = expr; :}
+               | _declaracionV2:expr    SEMICOLON    {: RESULT = expr; :}
+               | _asignacionV2:expr     SEMICOLON    {: RESULT = expr; :}
+               | _declaracionLista:expr SEMICOLON    {: RESULT = expr; :}
+               | _appendLista:expr      SEMICOLON    {: RESULT = expr; :}
+               | _asignacionLista:expr  SEMICOLON    {: RESULT = expr; :}
+               | _removeLista:expr      SEMICOLON    {: RESULT = expr; :}
+               | _popLista:expr         SEMICOLON    {: RESULT = expr; :}
+               | _reverseLista:expr     SEMICOLON    {: RESULT = expr; :}
+               | _struct:expr           SEMICOLON    {: RESULT = expr; :}
+               | _llamada:expr          SEMICOLON    {: RESULT = expr; :}
+               | _return:expr           SEMICOLON    {: RESULT = expr; :}
+               | error SEMICOLON                     {: RESULT = null; :}
+
+
+;
+
+_impresion ::= IMPRIMIR LPAREN _expresion:expr RPAREN   {: RESULT = new Imprimir(expr, exprleft, exprright); :}
+;
+
+// ------------------ DECLARACION VAR -----------------------------
+_declaracion ::= MUTB:mtb ID:id COLON _tipos:t                       {: RESULT = new Declaracion(mtb, id, t, tleft, tright); :}
+               | MUTB:mtb ID:id COLON _tipos:t IGUAL _expresion:expr {: RESULT = new Declaracion(mtb, id, expr, t, mtbleft, mtbright); :}
+;
+
+_asignacion ::=  ID:id IGUAL _expresion:expr            {: RESULT = new AsignacionVar(id, expr, idleft, idright); :}
+              |  ID:id INCREMENTO                       {: RESULT = new Incremento(id, idleft, idright); :}
+              |  ID:id DECREMENTO                       {: RESULT = new Decremento(id, idleft, idright); :}
+
+;
+
+_castear ::= CAST LPAREN _expresion:expr AS _tipos:t RPAREN  {: RESULT = new Casteo(expr, t, exprleft, exprright); :}
+;
+_round ::= ROUND:r LPAREN _expresion:expr RPAREN  {: RESULT = new Round(expr, rleft, rright); :}
+;
+_length ::= LENGTH:l LPAREN _expresion:expr RPAREN                      {: RESULT = new Length_func(expr, lleft, lright); :}
+          | LENGTH:l LPAREN ID:id LBRACE _expresion:i RBRACE RPAREN     {: RESULT = new Length_func(id, i, lleft, lright); :}
+;
+
+_toString ::= toSTRING:ts LPAREN _expresion:expr RPAREN {: RESULT = new ToString_func(expr, tsleft, tsright); :}
+;
+
+_stcIf ::= IF LPAREN _expresion:expr RPAREN LBRACE _instrucciones:instr RBRACE                                              {: RESULT = new If_stcControl(expr, instr, exprleft, exprright); :}
+         | IF LPAREN _expresion:expr RPAREN LBRACE _instrucciones:instr RBRACE ELSE LBRACE _instrucciones:instr2 RBRACE     {: RESULT = new IfElse_stcControl(expr, instr, instr2, exprleft, exprright); :}
+         | IF LPAREN _expresion:expr RPAREN LBRACE _instrucciones:instr RBRACE ELSE _stcIf:elseIf                           {: RESULT = new ElseIf_stcControl(expr,instr, elseIf, null,exprleft, exprright); :}
+;
+
+_cFor ::= FOR LPAREN _asignacion:asig SEMICOLON _expresion:expr SEMICOLON _asignacion:act RPAREN LBRACE _instrucciones:instr RBRACE {: RESULT = new For_ciclos(asig, expr, act, instr, asigleft, asigright); :}
+;
+
+_cWhile ::= WHILE LPAREN _expresion:cond RPAREN LBRACE _instrucciones:instr RBRACE        {: RESULT = new While_ciclos(cond, instr, condleft, condright); :}
+;
+
+_cDoWhile ::= DO LBRACE _instrucciones:instr RBRACE WHILE LPAREN _expresion:cond RPAREN   {: RESULT = new DoWhile_ciclos(cond, instr, condleft, condright); :}
+;
+
+//----------------------- MATCH ----------------------------
+_stcMatch ::= MATCH LPAREN _expresion:exp RPAREN LBRACE _casos:c RBRACE 
+              {: RESULT = new Match_stc(exp, c, expleft, expright); :}
+            | MATCH LPAREN _expresion:exp RPAREN LBRACE RBRACE
+              {: RESULT = new Match_stc(exp, new LinkedList<>(), expleft, expright); :}
+            ;
+
+_casos ::= _listCasos
+         | _listCasos _casoDefecto
+         | _casoDefecto
+         ;
+
+_listCasos ::= _listCasos _casoIndv
+             | _casoIndv
+             ;
+
+_casoIndv ::= _expresion:cond ARROW LBRACE _instrucciones:instr RBRACE
+             {: RESULT = new Caso(cond, instr, condleft, condright); :}
+             ;
+
+_casoDefecto ::= DEFAULT ARROW LBRACE _instrucciones:instr RBRACE
+                {: RESULT = new Caso(null, instr,instrleft, instrright ); :}
+                ;            
+
+
+
+
+// -------------- VECTORES --------------
+_declaracionV1 ::= MUTB:mtb ID:id COLON _tipos:t LCORCH RCORCH                                          {: RESULT = new DeclaracionV1(mtb, id, t, mtbleft, mtbright); :}
+                 | MUTB:mtb ID:id COLON _tipos:t LCORCH RCORCH IGUAL LCORCH _valoresVector1:expr RCORCH {: RESULT = new DeclaracionV1(mtb, id, expr, t, mtbleft, mtbright); :}
+;
+
+_declaracionV2 ::= MUTB:mtb ID:id COLON _tipos:t LCORCH RCORCH LCORCH RCORCH                                         {: RESULT = new DeclaracionV2(mtb, id, t, mtbleft, mtbright); :}
+                 | MUTB:mtb ID:id COLON _tipos:t LCORCH RCORCH LCORCH RCORCH IGUAL LCORCH _listListasV:listV RCORCH  {: RESULT = new DeclaracionV2(mtb, id, listV, t, mtbleft, mtbright); :}
+;
+
+_listListasV ::= _listListasV:listLista COMMA LCORCH _valoresVector1:listValores RCORCH       {: listLista.add(listValores); RESULT = listLista; :}
+               | LCORCH _valoresVector1:listValores RCORCH                                    {: RESULT = new LinkedList<LinkedList<Instruccion>>(); RESULT.add(listValores); :}
+;
+
+_valoresVector1 ::= _valoresVector1:listValores COMMA _expresion:valor  {: listValores.add(valor);  RESULT = listValores; :}
+                  | _expresion:valor                                    {: RESULT = new LinkedList<Instruccion>(); RESULT.add(valor); :}
+;
+
+_accesoV ::= ID:id LCORCH _expresion:ubi RCORCH  {: RESULT = new AccesoV1(id, ubi, idleft, idright); :}
+;
+
+_asignacionV1 ::= ID:id LCORCH _expresion:i RCORCH IGUAL _expresion:expr {: RESULT = new AsignacionV1(id, i, expr, idleft, idright); :}
+;
+
+_accesoV2 ::= ID:id LCORCH _expresion:i RCORCH LCORCH _expresion:j RCORCH {: RESULT = new AccesoV2(id, i, j, idleft, idright); :}
+;
+
+_asignacionV2 ::= ID:id LCORCH _expresion:i RCORCH LCORCH _expresion:j RCORCH IGUAL _expresion:expr {: RESULT = new AsignacionV2(id, i, j, expr, idleft, idright); :}
+;
+
+// -------------------------------------
+
+
+// -----------=--- LISTA ---------------
+_declaracionLista ::= MUTB:mtb ID:id COLON LISTA MENOR _tipos:t MAYOR {: RESULT = new DeclaracionLista(id, mtb, t, mtbleft, mtbright); :}
+;
+
+_appendLista ::= ID:id DOT APPEND LPAREN _expresion:expr RPAREN {: RESULT = new AppendList(id, expr, idleft, idright); :}
+;
+
+_accesoLista ::= ID:id DOT GETLIST LPAREN _expresion:i RPAREN {: RESULT = new AccesoLista(id, i, idleft, idright); :}
+;
+
+_asignacionLista ::= ID:id DOT SETLIST LPAREN _expresion:i COMMA _expresion:valor RPAREN {: RESULT = new AsignacionLista(id, i, valor, idleft, idright); :}
+;
+
+_removeLista ::= ID:id DOT REMVLIST LPAREN _expresion:i RPAREN {: RESULT = new RemoveLista(id, i, idleft, idright); :}
+;
+
+_popLista ::= ID:id DOT POPLIST LPAREN RPAREN {: RESULT = new PopListas(id, idleft, idright); :}
+;
+
+_reverseLista ::= ID:id DOT REVERSELIST LPAREN RPAREN {: RESULT = new ReverseLista(id, idleft, idright); :}
+;
+// ----------------------------------------
+// ------------------STRUCTS---------------------
+
+_struct ::= STRUCT ID:id LBRACE _listAtributos:listAt RBRACE {: RESULT = new DeclaracionStructs(id, listAt, idleft, idright); :}
+;
+
+_listAtributos ::= _listAtributos:listAt _atributoSTR:atrb   {: RESULT = listAt; RESULT.add(atrb); :}
+                 | _atributoSTR:atrb                         {: RESULT = new LinkedList<HashMap>(); RESULT.add(atrb); :}
+;
+
+_atributoSTR ::= ID:id COLON _tipos:t SEMICOLON    {: RESULT = new HashMap<String,Object>(); 
+                                                       RESULT.put("id", id); 
+                                                       RESULT.put("tipo", t); 
+                                                       RESULT.put("valor", null); :}
+               | ID:id COLON ID:id2 SEMICOLON      {: RESULT = new HashMap<String,Object>(); 
+                                                       RESULT.put("id", id); 
+                                                       RESULT.put("tipo", id2); 
+                                                       RESULT.put("valor", null); :}                                         
+;
+
+_instaStruct ::= MUTB:mtb ID:id COLON ID:id2 IGUAL LBRACE _listaValorSTR:l RBRACE {: RESULT = new InstanciaSTRUCT(id2, id, l, mtb, mtbleft, mtbright); :}
+               |LBRACE _listaValorSTR:l RBRACE  {: RESULT = new InstanciaSTRUCT(l, lleft, lright); :}
+;
+
+_listaValorSTR ::= _listaValorSTR:l COMMA _valorSTR:valstr {: RESULT = l; RESULT.putAll(valstr); :} 
+                 | _valorSTR:valstr                        {: RESULT = new HashMap<String,Instruccion>(); RESULT.putAll(valstr); :}
+;
+
+_valorSTR ::= ID:id COLON _expresion:expr   {: RESULT = new HashMap<String,Instruccion>(); RESULT.put(id.toString(), expr); :}
+            | ID:id COLON _instaStruct:rec  {: RESULT = new HashMap<String,Instruccion>(); RESULT.put(id.toString(), rec); :}
+;
+
+// ----------------------------------------
+
+
+_break ::= BREAKK:a         {: RESULT = new Break_stc(aleft, aright); :}
+;
+_continuar ::= CONTINUAR:a  {: RESULT = new Continuar(aleft, aright); :}
+;
+
+_return ::= RETURNSTC:a _expresion:expr {: RESULT = new Return_stc(expr, aleft, aright); :}
+          | RETURNSTC:a                 {: RESULT = new Return_stc(null, aleft, aright); :}
+;
+
+// ----------------- METODOS --------------------------
+_metodo ::= _tipos:t ID:id LPAREN _parametros:ps RPAREN LBRACE _instrucciones:instr RBRACE    {: RESULT = new Metodo(id, ps, instr, t, tleft, tright ); :}
+          | _tipos:t ID:id LPAREN RPAREN LBRACE _instrucciones:instr RBRACE                  {: RESULT = new Metodo(id, new LinkedList<HashMap>(), instr, t, tleft, tright ); :}
+
+;
+
+_parametros ::= _parametros:ps COMMA _parametro:p {: RESULT =  ps; 
+                                                     RESULT.add(p); 
+                                                  :} 
+              | _parametro:p                      {: RESULT =  new LinkedList <HashMap>(); 
+                                                     RESULT.add(p); 
+                                                  :}       
+;
+
+_parametro ::= ID:id COLON _tipos:t IGUAL _expresion:expr     {: var hm2 = new HashMap<String, Object>();
+                                                           hm2.put("tipo", t);
+                                                           hm2.put("id", id); 
+                                                           hm2.put("expresion", expr); 
+                                                           RESULT = hm2; 
+                                                        :}
+               | ID:id COLON _tipos:t                        {: var hm = new HashMap<String, Object>();
+                                                           hm.put("tipo", t);
+                                                           hm.put("id", id); 
+                                                           hm.put("expresion", null);
+                                                           RESULT = hm; 
+                                                        :}
+;
+
+// ------------------- MAIN ---------------------
+_run ::= MMMAIN ID:id LPAREN _parametrosLlamada:psll RPAREN    {: RESULT = new Run_Main(id, psll, idleft, idright); :}
+       | MMMAIN ID:id LPAREN RPAREN                            {: RESULT = new Run_Main(id, new LinkedList<HashMap>(), idleft, idright); :}
+;
+
+_parametrosLlamada ::= _parametrosLlamada:psll COMMA ID:id IGUAL _expresion:expr   {: var hm2 = new HashMap<String,Object>();
+                                                                                      hm2.put("id",id);
+                                                                                      hm2.put("expresion",expr);
+                                                                                      RESULT = psll;
+                                                                                      RESULT.add(hm2); 
+                                                                                   :}
+                     | ID:id IGUAL _expresion:expr    {:var hm = new HashMap<String,Object>();
+                                                        hm.put("id",id);
+                                                        hm.put("expresion",expr);
+                                                        RESULT = new LinkedList<HashMap>();
+                                                        RESULT.add(hm);
+                                                      :}
+;
+
+
+_llamada ::= ID:id LPAREN _parametrosLlamada:psll RPAREN  {: RESULT = new Llamada(id, psll, idleft, idright); :}
+           | ID:id LPAREN RPAREN                          {: RESULT = new Llamada(id, new LinkedList<HashMap>(), idleft, idright); :}
+;
+
+
+
+// --------------------------- expresiones --------------------------------
+_expresion ::= MENOS _expresion:valor                   {: RESULT = new NegacionUnaria(valor, valorleft, valorright); :}        %prec UMENOS
+             | _expresion:base POTENCIA _expresion:exp  {: RESULT = new Potencia(base, exp, baseleft, baseright); :}            %prec POTENCIA
+             | _expresion:radic RAIZ _expresion:indice  {: RESULT = new Raiz(radic, indice, radicleft, radicright); :}          %prec RAIZ
+             | _expresion:mult1 MULTI _expresion:mult2  {: RESULT = new Multiplicacion(mult1, mult2, mult1left, mult1right); :} %prec MULTI
+             | _expresion:div1 DIV _expresion:div2      {: RESULT = new Division(div1, div2, div1left, div1right); :}           %prec DIV
+             | _expresion:a MODULO _expresion:div2      {: RESULT = new Modulo(a, div2, aleft, aright); :}                      %prec MODULO
+             | _expresion:sum1 MAS _expresion:sum2      {: RESULT = new Suma (sum1, sum2, sum1left, sum1right); :}              %prec MAS
+             | _expresion:res1 MENOS _expresion:res2    {: RESULT = new Resta(res1, res2, res1left, res1right); :}              %prec MENOS
+             | _expresion:exp1 EQUALS _expresion:exp2   {: RESULT = new Equals(exp1, exp2, exp1left, exp1right); :}           %prec EQUALS
+             | _expresion:exp1 DIFERN _expresion:exp2   {: RESULT = new Diferencia(exp1, exp2, exp1left, exp1right); :}       %prec DIFERN
+             | _expresion:exp1 MENOR _expresion:exp2    {: RESULT = new Menor(exp1, exp2, exp1left, exp1right); :}            %prec MENOR
+             | _expresion:exp1 MAYOR _expresion:exp2    {: RESULT = new Mayor(exp1, exp2, exp1left, exp1right); :}            %prec MAYOR
+             | _expresion:exp1 MENIGUAL _expresion:exp2 {: RESULT = new MenorIgual(exp1, exp2, exp1left, exp1right); :}       %prec MENIGUAL
+             | _expresion:exp1 MAYIGUAL _expresion:exp2 {: RESULT = new MayorIgual(exp1, exp2, exp1left, exp1right); :}       %prec MAYIGUAL
+             | NOT _expresion:exp1                      {: RESULT = new NOT_logico(exp1, exp1left, exp1right); :}           %prec NOT
+             | _expresion:exp1 AND _expresion:exp2      {: RESULT = new AND_logico(exp1, exp2, exp1left, exp1right); :}     %prec AND
+             | _expresion:exp1 OR _expresion:exp2       {: RESULT = new OR_logico(exp1, exp2, exp1left, exp1right); :}      %prec OR
+             | ENTERO:entero                            {: RESULT = new Nativo(Integer.parseInt(entero), new Tipo(tipoDato.ENTERO), enteroleft, enteroright); :}
+             | CADENA:cadena                            {: RESULT = new Nativo(cadena, new Tipo(tipoDato.CADENA), cadenaleft, cadenaright); :}
+             | CARACTER:cha                             {: RESULT = new Nativo(cha, new Tipo(tipoDato.CARACTER), chaleft, charight); :}
+             | DECIMAL:decimal                          {: RESULT = new Nativo(new Double(decimal), new Tipo(tipoDato.DECIMAL), decimalleft, decimalright); :}
+             | TRUE:verd                                {: RESULT = new Nativo(verd, new Tipo(tipoDato.BOOLEANO), verdleft, verdright); :}
+             | FALSE:fal                                {: RESULT = new Nativo(fal, new Tipo(tipoDato.BOOLEANO), falleft, falright); :}
+             | ID:a                                     {: RESULT = new AccesoVar(a, aleft, aright); :}
+             | _accesoV:expr                            {: RESULT = expr; :}
+             | _accesoV2:expr                           {: RESULT = expr; :}
+             | _accesoLista:expr                        {: RESULT = expr; :}
+             | _removeLista:expr                        {: RESULT = expr; :}
+             | _popLista:expr                           {: RESULT = expr; :}
+             | _llamada:expr                            {: RESULT = expr; :}
+             | _castear:expr                            {: RESULT = expr; :}
+             | _round:expr                              {: RESULT = expr; :}
+             | _length:expr                             {: RESULT = expr; :}
+             | _toString:expr                           {: RESULT = expr; :}
+             | LPAREN _expresion:expr RPAREN            {: RESULT = expr; :}
+;
+
+_tipos ::= INT      {: RESULT = new Tipo(tipoDato.ENTERO);   :}
+        | DOUBLE    {: RESULT = new Tipo(tipoDato.DECIMAL);  :}
+        | BOOL      {: RESULT = new Tipo(tipoDato.BOOLEANO); :}
+        | CHARV     {: RESULT = new Tipo(tipoDato.CARACTER); :}
+        | STRING    {: RESULT = new Tipo(tipoDato.CADENA);   :}
+        | METODO    {: RESULT = new Tipo(tipoDato.VOID);     :}
+
+;
+
